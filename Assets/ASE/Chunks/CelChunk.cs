@@ -49,7 +49,7 @@ namespace ASE {
 
             if (cel_type == 0) {
                 //TODO Figure out what/when this is part of the save file
-                BuildRawCell(ref chunkData);
+                ProcessCell(ref chunkData, false);
 
             } else if (cel_type == 1) {
                 //TODO Figure out what/when this is part of the save file No Image in cel??Doesn't make sense
@@ -57,7 +57,7 @@ namespace ASE {
                 return;
             } else if (cel_type == 2) {
                 //All my saves have been compressed.
-                ProcessCompressCell(ref chunkData);
+                ProcessCell(ref chunkData, true);
             }
 
             //puts the cel on the frame. I want each cell on a blank new layer. Need to convert
@@ -81,25 +81,19 @@ namespace ASE {
             for_future = Read.BYTEARRAY(ref chunkData, 7);
         }
 
-        private void BuildRawCell(ref byte[] chunkData) {
+        private void ProcessCell(ref byte[] chunkData, bool compressed) {
             BuildWidthHeight(ref chunkData);
 
-            raw_data = Read.BYTEARRAY(ref chunkData, width_in_pixels * height_in_pixels);
+            if (compressed) {
+                raw_cel_compressed = chunkData;
 
-            //BuildColor32AlphaBlended();
+                int count = width_in_pixels * height_in_pixels * (color_depth / 8);
+                raw_data = Read.DecompressImageBytes(raw_cel_compressed, count);
+            } else {
+                raw_data = Read.BYTEARRAY(ref chunkData, width_in_pixels * height_in_pixels);
+            }
+
             BuildColor32Direct();
-        }
-
-        private void ProcessCompressCell(ref byte[] chunkData) {
-            BuildWidthHeight(ref chunkData);
-
-            raw_cel_compressed = chunkData;
-
-            int count = width_in_pixels * height_in_pixels * (color_depth / 8);
-            raw_data = Read.DecompressImageBytes(raw_cel_compressed, count);
-
-            BuildColor32AlphaBlended();
-            //BuildColor32Direct();
         }
 
         private void BuildWidthHeight(ref byte[] chunkData) {
@@ -112,19 +106,7 @@ namespace ASE {
             for (int i = 0, b = 0; i < raw_data.Length; i += 4, b++) {
                 pixels[b] = new Color32(raw_data[i], raw_data[i + 1], raw_data[i + 2], raw_data[i + 3]);
             }
-        }
-
-        private void BuildColor32AlphaBlended() {
-            pixels = new Color32[raw_data.Length / 4];
-            var len = width_in_pixels * height_in_pixels;
-            for (int p = 0, b = 0; p < len; p++, b += 4) {
-                //Not sure I care about opacity.
-                var red = (byte)(raw_data[b + 0] * raw_data[b + 3] / 255);
-                var green = (byte)(raw_data[b + 1] * raw_data[b + 3] / 255);
-                var blue = (byte)(raw_data[b + 2] * raw_data[b + 3] / 255);
-                var alpha = raw_data[b + 3];
-                pixels[p] = new Color32(red, green, blue, alpha);
-            }
+            FlipColor32();
         }
 
         private void BuildSprite() {
@@ -132,7 +114,6 @@ namespace ASE {
                 filterMode = FilterMode.Point
             };
 
-            pixels = FlipColor32(pixels, width_in_pixels);
             tex.SetPixels32(pixels);
             tex.Apply();
 
@@ -140,17 +121,17 @@ namespace ASE {
             sprite = Sprite.Create(tex, r, new Vector2(0.5f, 0.5f), 100.0f, 0, SpriteMeshType.FullRect);
         }
 
-        //Aseprite Images origin pixel is bottom left but we need it to be top left.
-        //This could be built directly into the part where colors are first created Skipping needing to do this
-        public Color32[] FlipColor32(Color32[] bytes, int width) {
-            Color32[] flippedBytes = new Color32[bytes.Length];
 
-            for (int i = 0, j = bytes.Length - width; i < bytes.Length; i += width, j -= width) {
-                for (int k = 0; k < width; ++k) {
-                    flippedBytes[i + k] = bytes[j + k];
+        //Aseprite Images origin pixel is bottom left but we need it to be top left.
+        public void FlipColor32() {
+            var flipped = new Color32[raw_data.Length / 4];
+
+            for (int i = 0, j = pixels.Length - width_in_pixels; i < pixels.Length; i += width_in_pixels, j -= width_in_pixels) {
+                for (int k = 0; k < width_in_pixels; ++k) {
+                    flipped[i + k] = pixels[j + k];
                 }
             }
-            return flippedBytes;
+            pixels = flipped;
         }
     }
 }
