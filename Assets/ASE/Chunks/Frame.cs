@@ -11,6 +11,7 @@ namespace ASE {
         public byte[] for_future; //size 2
         public uint number_of_chunks; //if 0 use old_chunks
         public uint chunks;
+        public ushort color_depth;
         public List<OldPaletteChunk> oldPaletteChunks;
         public List<LayerChunk> layerChunks;
         public List<CelChunk> celChunks;
@@ -23,7 +24,7 @@ namespace ASE {
         public List<UserDataChunk> userDataChunks;
         public List<SliceChunk> sliceChunks;
 
-        public Frame(uint bytesInFrame, ushort magicNumber) {
+        public Frame(uint bytesInFrame, ushort magicNumber, ushort colorDepth) {
             bytes_in_frame = bytesInFrame;
             magic_number = magicNumber;
             old_chunks = 0;
@@ -42,6 +43,7 @@ namespace ASE {
             paletteChunks = new List<PaletteChunk>();
             userDataChunks = new List<UserDataChunk>();
             sliceChunks = new List<SliceChunk>();
+            color_depth = colorDepth;
         }
         public void GenerateChunk(ref byte[] chunkData) {
             old_chunks = Read.WORD(ref chunkData);

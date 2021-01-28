@@ -42,7 +42,7 @@ namespace ASE {
             frame_position_to_link_with = 0;
             raw_cel_compressed = new byte[0];
         }
-
+        //TODO GenerateChunk could be combined with the constructor with the removal of the interface
         public void GenerateChunk(ref byte[] chunkData) {
 
             BuildChunkVariables(ref chunkData);
