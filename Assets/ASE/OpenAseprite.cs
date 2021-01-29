@@ -26,6 +26,7 @@ namespace ASE {
 
         public Image image;
         public byte[] data;
+        public List<string> LayerNames;
 
         public AsepriteObj asepriteObj;
         private void Awake() {
@@ -43,18 +44,18 @@ namespace ASE {
                 { USERDATA_MAGIC, (chunkData, frame) => CreateUser(ref chunkData, frame) },
                 { SLICE_MAGIC, (chunkData, frame) => CreateSlice(ref chunkData, frame) }
             };
+
             StartCoroutine(Load("file:///c://Sprite-0001.aseprite"));
         }
 
         public IEnumerator Load(string path) {
-
+            LayerNames = new List<string>();
             using UnityWebRequest w = UnityWebRequest.Get(path);
             yield return w.SendWebRequest();
 
             data = w.downloadHandler.data;
 
             Process();
-            Debug.Log("DONE");
         }
 
         private void Process() {
@@ -66,10 +67,12 @@ namespace ASE {
             asepriteObj = new AsepriteObj {
                 header = new Header()
             };
-            var header = asepriteObj.header;
-            header.GenerateChunk(ref data);
 
-            if (!header.headerHex.Equals(HEADER_MAGIC)) {
+
+            asepriteObj.header.GenerateChunk(ref data);
+
+
+            if (!asepriteObj.header.headerHex.Equals(HEADER_MAGIC)) {
                 Debug.Log("Only supports aseprite files.");
                 return;
             }
@@ -85,7 +88,9 @@ namespace ASE {
 
                 //Making sure we have an aseprite file frame. This is guarenteed if a real aseprite file was loaded
                 if (magicNumberHex.Equals(FRAME_MAGIC)) {
-                    Frame frame = new Frame(bytesInFrame, magicNumber, header.color_depth);
+                    Frame frame = new Frame(bytesInFrame, magicNumber, asepriteObj.header.color_depth);
+                    frame.width_in_pixels = asepriteObj.header.width_in_pixels;
+                    frame.height_in_pixels = asepriteObj.header.height_in_pixels;
                     frame.GenerateChunk(ref frameData);
 
                     while (frameData.Length > 1) {
@@ -105,68 +110,73 @@ namespace ASE {
 
         }
 
-        public void CreateOldPalette(ref byte[] chunkData, Frame frame) {
+        private void CreateOldPalette(ref byte[] chunkData, Frame frame) {
             OldPaletteChunk oldPaletteChunk = new OldPaletteChunk();
             oldPaletteChunk.GenerateChunk(ref chunkData);
             frame.oldPaletteChunks.Add(oldPaletteChunk);
         }
 
-        public void CreateLayer(ref byte[] chunkData, Frame frame) {
+        private void CreateLayer(ref byte[] chunkData, Frame frame) {
             LayerChunk layerChunk = new LayerChunk();
             layerChunk.GenerateChunk(ref chunkData);
             frame.layerChunks.Add(layerChunk);
+            LayerNames.Add(layerChunk.layer_name);
         }
 
-        public void CreateCel(ref byte[] chunkData, Frame frame) {
+        private void CreateCel(ref byte[] chunkData, Frame frame) {
             CelChunk celChunk = new CelChunk(frame.color_depth);
             celChunk.GenerateChunk(ref chunkData);
-
-            //testing
+            //Debug.Log(celChunk.layer_index);
+            //Debug.Log(frame.layerChunks[celChunk.layer_index].layer_name);
+            ////testing
+            celChunk.layer_name = LayerNames[celChunk.layer_index];
+            celChunk.BuildSprite(frame.width_in_pixels, frame.height_in_pixels);
             image.sprite = celChunk.sprite;
 
             frame.celChunks.Add(celChunk);
         }
 
-        public void CreateCelExtra(ref byte[] chunkData, Frame frame) {
+        private void CreateCelExtra(ref byte[] chunkData, Frame frame) {
             CelExtraChunk celExtraChunk = new CelExtraChunk();
             celExtraChunk.GenerateChunk(ref chunkData);
             frame.celExtraChunks.Add(celExtraChunk);
         }
 
-        public void CreateColor(ref byte[] chunkData, Frame frame) {
+        private void CreateColor(ref byte[] chunkData, Frame frame) {
             ColorProfileChunk colorProfileChunk = new ColorProfileChunk();
             colorProfileChunk.GenerateChunk(ref chunkData);
             frame.colorProfileChunks.Add(colorProfileChunk);
         }
 
-        public void CreateMask(ref byte[] chunkData, Frame frame) {
+        private void CreateMask(ref byte[] chunkData, Frame frame) {
             MaskChunk maskChunk = new MaskChunk();
             maskChunk.GenerateChunk(ref chunkData);
             frame.maskChunks.Add(maskChunk);
         }
 
-        public void CreatePath(ref byte[] chunkData, Frame frame) {
+        private void CreatePath(ref byte[] chunkData, Frame frame) {
             //Left empty for future
         }
 
-        public void CreateTag(ref byte[] chunkData, Frame frame) {
+        private void CreateTag(ref byte[] chunkData, Frame frame) {
             TagChunk tagChunk = new TagChunk();
             tagChunk.GenerateChunk(ref chunkData);
             frame.tagChunks.Add(tagChunk);
         }
 
-        public void CreatePalatte(ref byte[] chunkData, Frame frame) {
+        private void CreatePalatte(ref byte[] chunkData, Frame frame) {
             PaletteChunk paletteChunk = new PaletteChunk();
             paletteChunk.GenerateChunk(ref chunkData);
             frame.paletteChunks.Add(paletteChunk);
         }
 
-        public void CreateUser(ref byte[] chunkData, Frame frame) {
+        private void CreateUser(ref byte[] chunkData, Frame frame) {
             UserDataChunk userDataChunk = new UserDataChunk();
             userDataChunk.GenerateChunk(ref chunkData);
             frame.userDataChunks.Add(userDataChunk);
         }
-        public void CreateSlice(ref byte[] chunkData, Frame frame) {
+
+        private void CreateSlice(ref byte[] chunkData, Frame frame) {
             SliceChunk sliceChunk = new SliceChunk();
             sliceChunk.GenerateChunk(ref chunkData);
             frame.sliceChunks.Add(sliceChunk);

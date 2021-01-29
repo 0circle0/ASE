@@ -26,6 +26,7 @@ namespace ASE {
 
         //ASE helper
         public ushort color_depth;
+        public string layer_name;
         public CelChunk(ushort colorDepth) {
             color_depth = colorDepth;
             layer_index = 0;
@@ -41,6 +42,7 @@ namespace ASE {
             sprite = null;
             frame_position_to_link_with = 0;
             raw_cel_compressed = new byte[0];
+            layer_name = "null";
         }
         //TODO GenerateChunk could be combined with the constructor with the removal of the interface
         public void GenerateChunk(ref byte[] chunkData) {
@@ -60,16 +62,6 @@ namespace ASE {
                 ProcessCell(ref chunkData, true);
             }
 
-            //puts the cel on the frame. I want each cell on a blank new layer. Need to convert
-            //CelToFrame(asepriteObj.header, frame, celChunk);
-            //Once CelToFrame has been applied we need to adjust width_in_pixels and height_in_pixels to that of the frame.
-
-            //This could happen with blank layers?
-            if (pixels.Length == 0)
-                return;
-
-            //Create just this cel. Will not be dimentions of aseprite. Compressed to smalled size possible CelToFrame solves this
-            BuildSprite();
         }
 
         private void BuildChunkVariables(ref byte[] chunkData) {
@@ -109,15 +101,23 @@ namespace ASE {
             FlipColor32();
         }
 
-        private void BuildSprite() {
-            Texture2D tex = new Texture2D(width_in_pixels, height_in_pixels) {
+        public void BuildSprite(int width, int height) {
+            Texture2D tex = new Texture2D(width, height) {
                 filterMode = FilterMode.Point
             };
+            var clear = new Color32[width*height];
+            for(int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++) {
+                    clear[x+y] = Color.clear;
+                }
 
-            tex.SetPixels32(pixels);
+            tex.SetPixels32(clear);
+            var flip = height - height_in_pixels;
+            tex.SetPixels32(x_position, flip - y_position, width_in_pixels, height_in_pixels, pixels);
+            //tex.SetPixels32(newColors);
             tex.Apply();
 
-            Rect r = new Rect(0f, 0f, width_in_pixels, height_in_pixels);
+            Rect r = new Rect(0f, 0f, width, height);
             sprite = Sprite.Create(tex, r, new Vector2(0.5f, 0.5f), 100.0f, 0, SpriteMeshType.FullRect);
         }
 

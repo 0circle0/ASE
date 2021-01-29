@@ -23,6 +23,8 @@ namespace ASE {
         public List<PaletteChunk> paletteChunks;
         public List<UserDataChunk> userDataChunks;
         public List<SliceChunk> sliceChunks;
+        public ushort width_in_pixels;
+        public ushort height_in_pixels;
 
         public Frame(uint bytesInFrame, ushort magicNumber, ushort colorDepth) {
             bytes_in_frame = bytesInFrame;
@@ -44,6 +46,8 @@ namespace ASE {
             userDataChunks = new List<UserDataChunk>();
             sliceChunks = new List<SliceChunk>();
             color_depth = colorDepth;
+            width_in_pixels = 0;
+            height_in_pixels = 0;
         }
         public void GenerateChunk(ref byte[] chunkData) {
             old_chunks = Read.WORD(ref chunkData);
