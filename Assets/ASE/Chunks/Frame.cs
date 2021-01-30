@@ -8,6 +8,7 @@ namespace ASE {
         public ushort magic_number;
         public ushort old_chunks;
         public ushort frame_duration;
+        [NonSerialized]
         public byte[] for_future; //size 2
         public uint number_of_chunks; //if 0 use old_chunks
         public uint chunks;

@@ -10,6 +10,7 @@ namespace ASE {
         public ushort default_layer_height_in_pixels;
         public ushort blend_mode;
         public byte opacity;
+        [NonSerialized]
         public byte[] for_future; //Set to 0
         public string layer_name;
 

@@ -21,10 +21,11 @@ namespace ASE {
         public const string PALETTE_MAGIC = "2019";
         public const string USERDATA_MAGIC = "2020";
         public const string SLICE_MAGIC = "2022";
-
+        [NonSerialized]
         public Dictionary<string, Action<byte[], Frame>> Magic;
 
         public Image image;
+        [NonSerialized]
         public byte[] data;
         public List<string> LayerNames;
 
