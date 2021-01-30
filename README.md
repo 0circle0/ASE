@@ -3,7 +3,7 @@ Converts .aseprite and .ase files from Aseprite into Sprite Textures for Unity3D
 
 usage:
 
-StartCoroutine(Load(string path));
+StartCoroutine(OpenAseprite.Load(string path)); //file///:c://example.aseprite
 
 Creates an Aseprite Object with a header and frames.
 Cels have the layer they are on assigned to them.
