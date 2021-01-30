@@ -15,5 +15,3 @@ Doesn't apply any blending. Pixel data is 1:1
 
 This is being created for Sprite Creator found @ https://facebook.com/SpriteCreator3 a free app for sprite avatar creation.
 Currently working on support for Gather @ https://gather.town/ and the sprites they are making.
-
-Join Gather.town discord
