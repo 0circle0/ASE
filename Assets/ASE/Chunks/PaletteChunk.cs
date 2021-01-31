@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ASE {
     [Serializable]
@@ -7,7 +8,7 @@ namespace ASE {
         public uint new_palette_size;
         public uint start;
         public uint end;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] for_future; //size 8
         public List<PaletteEntry> palette_entries;
 

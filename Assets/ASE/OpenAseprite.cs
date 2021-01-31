@@ -21,15 +21,20 @@ namespace ASE {
         public const string PALETTE_MAGIC = "2019";
         public const string USERDATA_MAGIC = "2020";
         public const string SLICE_MAGIC = "2022";
-        [NonSerialized]
+        [HideInInspector]
         public Dictionary<string, Action<byte[], Frame>> Magic;
 
+        public Action<string> OnError = delegate { };
+        public Action<AsepriteObj> OnSuccess = delegate { };
+
         public Image image;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] data;
         public List<string> LayerNames;
 
+        //Seeing in inspector is the point
         public AsepriteObj asepriteObj;
+
         private void Awake() {
             Magic = new Dictionary<string, Action<byte[], Frame>> {
                 { OLD_PALETTE_MAGIC, (chunkData, frame) => CreateOldPalette(ref chunkData, frame) },
@@ -48,23 +53,23 @@ namespace ASE {
 
             StartCoroutine(Load("file:///c://Sprite-0001.aseprite"));
         }
-
+        //Keep track of the start time of coroutine
+        //yield when the coroutine is taking too long.
         public IEnumerator Load(string path) {
+            
             LayerNames = new List<string>();
             using UnityWebRequest w = UnityWebRequest.Get(path);
             yield return w.SendWebRequest();
 
             data = w.downloadHandler.data;
 
-            Process();
-        }
-
-        private void Process() {
             if (data.Length < 128) {
-                Debug.Log("File too small.");
-                return;
+                //Debug.Log("File too small.");
+                OnError?.Invoke("File too small.");
+                yield break;
             }
 
+            //I want a perm object
             asepriteObj = new AsepriteObj {
                 header = new Header()
             };
@@ -74,8 +79,9 @@ namespace ASE {
 
 
             if (!asepriteObj.header.headerHex.Equals(HEADER_MAGIC)) {
-                Debug.Log("Only supports aseprite files.");
-                return;
+                //Debug.Log("Only supports aseprite files.");
+                OnError?.Invoke("Only supports aseprite files.");
+                yield break;
             }
 
             while (data.Length > 1) {
@@ -89,9 +95,10 @@ namespace ASE {
 
                 //Making sure we have an aseprite file frame. This is guarenteed if a real aseprite file was loaded
                 if (magicNumberHex.Equals(FRAME_MAGIC)) {
-                    Frame frame = new Frame(bytesInFrame, magicNumber, asepriteObj.header.color_depth);
-                    frame.width_in_pixels = asepriteObj.header.width_in_pixels;
-                    frame.height_in_pixels = asepriteObj.header.height_in_pixels;
+                    Frame frame = new Frame(bytesInFrame, magicNumber, asepriteObj.header.color_depth) {
+                        width_in_pixels = asepriteObj.header.width_in_pixels,
+                        height_in_pixels = asepriteObj.header.height_in_pixels
+                    };
                     frame.GenerateChunk(ref frameData);
 
                     while (frameData.Length > 1) {
@@ -106,9 +113,8 @@ namespace ASE {
                     }
                     asepriteObj.frames.Add(frame);
                 }
-
             }
-
+            OnSuccess?.Invoke(asepriteObj);
         }
 
         private void CreateOldPalette(ref byte[] chunkData, Frame frame) {

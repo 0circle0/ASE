@@ -12,12 +12,12 @@ namespace ASE {
         public ushort color_depth; //Color depth(bits per pixel)
         public uint flags; //Flags: 1 = Layer opacity has valid value
         public ushort speed; //DEPRECATED: You should use the frame duration field from each frame header
-        [NonSerialized]
+        [HideInInspector]
         public uint _empty1; //set to 0
-        [NonSerialized]
+        [HideInInspector]
         public uint _empty2; //set to 0
         public byte palette_index; //Palette entry (index) which represent transparent color in all non-background layers(only for Indexed sprites).
-        [NonSerialized]
+        [HideInInspector]
         public byte[] ignore_these_bytes;
         public ushort number_of_colors; //Number of colors (0 means 256 for old sprites)
         public byte pixel_width; //Pixel width (pixel ratio is "pixel width/pixel height"). If this or pixel height field is zero, pixel ratio is 1:1
@@ -26,9 +26,9 @@ namespace ASE {
         public short y_position_on_grid;
         public ushort grid_width; //0 if no grid
         public ushort grid_height;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] for_future; //set to 0
-        [NonSerialized]
+        [HideInInspector]
         public Color32[] pixels;
         public string headerHex;
 

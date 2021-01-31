@@ -9,15 +9,15 @@ namespace ASE {
         public short y_position;
         public byte opacity;
         public ushort cel_type;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] for_future; //size 7
 
         //for cel type = 0
         public ushort width_in_pixels;
         public ushort height_in_pixels;
-        [NonSerialized]
+        [HideInInspector]
         public Color32[] pixels;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] raw_data;
         public Sprite sprite;
 
@@ -25,7 +25,7 @@ namespace ASE {
         public ushort frame_position_to_link_with;
 
         //for cel type = 2
-        [NonSerialized]
+        [HideInInspector]
         public byte[] raw_cel_compressed;
 
         //ASE helper

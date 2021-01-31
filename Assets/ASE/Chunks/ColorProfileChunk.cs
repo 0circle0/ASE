@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace ASE {
     [Serializable]
@@ -6,11 +7,11 @@ namespace ASE {
         public ushort type;
         public ushort flags;
         public float fixed_gamma;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] reserved; // size 8
                                 //if type 2
         public uint icc_profile_length;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] icc_profile_data;
 
         public void GenerateChunk(ref byte[] chunkData) {

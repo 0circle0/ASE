@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace ASE {
     [Serializable]
@@ -7,10 +8,10 @@ namespace ASE {
         public short y_position;
         public ushort width;
         public ushort height;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] for_future; //size 8
         public string mask_name;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] bit_map_data;
 
         public void GenerateChunk(ref byte[] chunkData) {

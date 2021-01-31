@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ASE {
     [Serializable]
     public struct TagChunk : Chunk {//0x2018
         public ushort number_of_tags;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] for_future; //size 8
         public List<Tag> tags;
 

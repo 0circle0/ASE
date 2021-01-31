@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace ASE {
     [Serializable]
@@ -8,7 +9,7 @@ namespace ASE {
         public float precise_y_position;
         public float width_of_cel_in_sprite;
         public float height_of_cel_in_sprite;
-        [NonSerialized]
+        [HideInInspector]
         public byte[] for_future; //size 16
 
         public void GenerateChunk(ref byte[] chunkData) {

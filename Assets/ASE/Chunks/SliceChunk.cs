@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ASE {
     [Serializable]
     public struct SliceChunk : Chunk {//0x2022
         public uint number_of_slice_keys;
         public uint flags; //1= 9-patch slice, 2 = has pivot info
-        [NonSerialized]
+        [HideInInspector]
         public uint reserved;
         public string name;
         public List<SliceKey> slice_keys;
