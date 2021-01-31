@@ -10,15 +10,15 @@ StartCoroutine(OpenAseprite.Load(string path));
 ```
 
 ### Output
-Creates an Aseprite Object with a header and frames.
-Cels have the layer they are on assigned to them.
-Cels have the sprite created.
+Creates an Aseprite Object that constains all the Frames with in it.
+Sprites are also automatically created when a CelChunk is found.
+Each layer and each frame is rendered individually nothing is combined.
 All information from inside an aseprite file is parsed and available.
 
 #### What it doesn't do
 Doesn't apply any blending. Pixel data is 1:1
+CelChunk sprite will be the Header size and not the CelChunk size. Image unaffected.
 Does not create animations from frame data.
-Each layer and each frame is rendered individually.
 Output Cel Layers are not combined.
 
 ##### Support
