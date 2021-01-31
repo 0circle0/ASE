@@ -1,6 +1,9 @@
 # ASE
 Converts .aseprite and .ase files from Aseprite into Sprite Textures for Unity3D
 
+## API:
+https://docs.google.com/document/d/1Ee-JvsSr_Zk0TOiBZP-b9XU943M7BDcho_OQl_csgns/edit?usp=sharing
+
 ## Usage:
 ```
 using ASE;
