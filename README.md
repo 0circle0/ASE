@@ -26,6 +26,3 @@ Output Cel Layers are not combined.
 
 ##### Support
 This is being created for Sprite Creator found @ https://facebook.com/SpriteCreator3 a free app for sprite avatar creation.
-
-###### Other peoples projects
-Currently working on support for Gather @ https://gather.town/ and the sprites they are making.
